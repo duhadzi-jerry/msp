@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mirjy Synergy Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="shortcut icon" href="https://res.cloudinary.com/dj8oams9u/image/upload/v1749059198/logo_q0ifto.png" type="image/x-icon">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f8f9fa;
+    }
+    .navbar {
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .stat-card {
+      border: none;
+      border-radius: .5rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .leaderboard img {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+    }
+    .progress {
+      height: 8px;
+    }
+    .announcement {
+      border-left: 4px solid #0d6efd;
+      padding-left: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="content">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light mb-4 px-3">
+      <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+          <img src="https://res.cloudinary.com/dj8oams9u/image/upload/v1748738163/logo-full_jtgkq4.png" height="50" alt="Mirjy">
+        </a>
+        <div class="dropdown ms-auto">
+          <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://via.placeholder.com/40" alt="" class="rounded-circle me-2">
+            <strong>John Doe</strong>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <li><a class="dropdown-item" href="#">Settings</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#">Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <!-- Stats -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6">
+          <div class="card stat-card p-3">
+            <h6 class="text-muted">Clients Acquired</h6>
+            <h3>24</h3>
+            <div class="progress mt-2">
+              <div class="progress-bar bg-success" style="width: 48%"></div>
+            </div>
+            <small class="text-muted">48% of quarterly goal</small>
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="card stat-card p-3">
+            <h6 class="text-muted">Total Commission</h6>
+            <h3>$3,450</h3>
+            <div class="progress mt-2">
+              <div class="progress-bar bg-info" style="width: 69%"></div>
+            </div>
+            <small class="text-muted">Target: $5,000</small>
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="card stat-card p-3">
+            <h6 class="text-muted">Active Leads</h6>
+            <h3>12</h3>
+            <div class="progress mt-2">
+              <div class="progress-bar bg-warning" style="width: 30%"></div>
+            </div>
+            <small class="text-muted">Working on 8 new</small>
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="card stat-card p-3">
+            <h6 class="text-muted">Conversion Rate</h6>
+            <h3>58%</h3>
+            <div class="progress mt-2">
+              <div class="progress-bar bg-danger" style="width: 58%"></div>
+            </div>
+            <small class="text-muted">Goal: 70%</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leaderboard -->
+      <div class="card leaderboard mb-4">
+        <div class="card-header bg-white">
+          <strong>Top Performers – Quarterly Bonus</strong>
+        </div>
+        <div class="card-body">
+          <table class="table table-borderless align-middle">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Agent</th>
+                <th>Clients Acquired</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="table-warning">
+                <td><span class="badge bg-warning text-dark fs-6">🥇 1</span></td>
+                <td>Alice Johnson</td>
+                <td>48</td>
+              </tr>
+              <tr class="table-secondary">
+                <td><span class="badge bg-secondary fs-6">🥈 2</span></td>
+                <td>Mark Smith</td>
+                <td>42</td>
+              </tr>
+              <tr class="table-danger">
+                <td><span class="badge bg-danger fs-6">🥉 3</span></td>
+                <td>Jane Williams</td>
+                <td>39</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Lead Management -->
+      <div class="card mb-4">
+        <div class="card-header bg-white">
+          <strong>My Active Leads</strong>
+        </div>
+        <div class="card-body">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Client Name</th>
+                <th>Status</th>
+                <th>Potential Value</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Michael Green</td>
+                <td><span class="badge bg-warning">Pending</span></td>
+                <td>$500</td>
+                <td><button class="btn btn-sm btn-success">Mark Won</button></td>
+              </tr>
+              <tr>
+                <td>Sara Lee</td>
+                <td><span class="badge bg-info">In Progress</span></td>
+                <td>$1,200</td>
+                <td><button class="btn btn-sm btn-success">Mark Won</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Announcements -->
+      <div class="card mb-4">
+        <div class="card-header bg-white">
+          <strong>Program Announcements</strong>
+        </div>
+        <div class="card-body">
+          <div class="announcement mb-3">
+            <h6>🚀 New Bonus Structure</h6>
+            <p>Earn double commission for clients closed this month.</p>
+          </div>
+          <div class="announcement">
+            <h6>🎯 Training Webinar</h6>
+            <p>Join us next Tuesday at 4 PM for lead conversion strategies.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+asgiref
+bootstrap4
+Django
+gunicorn
+packaging
+pillow
+psycopg2-binary
+sqlparse
+tzdata
+dj-database-url
+django-widget-tweaks
+django-crispy-forms

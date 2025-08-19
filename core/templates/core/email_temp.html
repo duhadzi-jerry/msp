@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email</title>
+    <style>
+        body {
+            background: #f8f9fa;
+            font-family: "Segoe UI", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .invoice-box {
+            background: #fff;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 700px;
+            margin: 32px auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.04);
+            border: 1px solid #e9ecef;
+        }
+        .invoice-title {
+            font-weight: 600;
+            color: #343a40;
+            font-size: 1.5em;
+            margin-bottom: 8px;
+        }
+        .company-logo {
+            height: 50px;
+            margin-bottom: 12px;
+        }
+        .info-table, .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+        }
+        .info-table td {
+            padding: 2px 0;
+            font-size: 14px;
+            color: #495057;
+        }
+        .summary-table th, .summary-table td {
+            border: 1px solid #dee2e6;
+            padding: 8px;
+            font-size: 14px;
+            text-align: left;
+        }
+        .summary-table th {
+            background: #f1f3f5;
+            font-weight: 600;
+        }
+        .summary-table td.text-end {
+            text-align: right;
+        }
+        .totals-table {
+            width: 100%;
+            margin-top: 12px;
+            font-size: 15px;
+        }
+        .totals-table td {
+            padding: 4px 0;
+        }
+        .totals-table .label {
+            text-align: right;
+            color: #495057;
+        }
+        .totals-table .value {
+            text-align: right;
+            font-weight: 600;
+        }
+        .section-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin: 24px 0 8px 0;
+            color: #343a40;
+        }
+        ul {
+            margin: 0 0 0 18px;
+            padding: 0;
+            font-size: 14px;
+            color: #495057;
+        }
+        .footer {
+            text-align: center;
+            color: #adb5bd;
+            font-size: 13px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        @media only screen and (max-width: 600px) {
+            .invoice-box {
+                padding: 8px;
+                max-width: 100%;
+            }
+            .summary-table th, .summary-table td, .totals-table td {
+                font-size: 13px;
+                padding: 6px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="invoice-box">
+        <table class="info-table">
+            <tr>
+                <td style="width:60%;">
+                    <img src="https://res.cloudinary.com/dj8oams9u/image/upload/v1748738163/logo-full_jtgkq4.png" class="company-logo" alt="Company Logo" /><br>
+                    
+                </td>
+            </tr>
+        </table>
+            <div style="margin-left: 20px; margin-right: 20px;">
+                <p>Hello {{name}},</p>
+                <div>{{ content }}</div>
+                <br><br>
+                <div>Best Regards,<br>Mirjy Technologies Ltd<br>https://mirjy.com</div>
+            </div>
+
+        <br>
+        <hr style="margin: 20px 0;">
+        <div class="footer">
+            If you have any questions regarding this email, please contact us at {{ email }}.<br><br>
+            Thank you.
+        </div>
+    </div>
+</body>
+
+</html>
