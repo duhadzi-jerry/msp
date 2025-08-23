@@ -12,6 +12,16 @@ class SynergyApplicationForm(forms.ModelForm):
         model = SynergyApplication
         fields = ['full_name', 'email', 'phone', 'pitch', 'cv']
 
+class LeadForm(forms.ModelForm):
+    class Meta:
+        model = Lead
+        fields = ['name', 'email', 'phone', 'notes']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter lead name'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter lead email'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter lead phone'}),
+            'notes': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Enter notes about the lead'}),
+        }
 
 class ForgotPasswordForm(forms.Form):
     email = forms.EmailField(

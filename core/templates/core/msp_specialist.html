@@ -47,150 +47,549 @@
         <div class="dropdown ms-auto">
           <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
             <img src="https://via.placeholder.com/40" alt="" class="rounded-circle me-2">
-            <strong>John Doe</strong>
+            <strong>{{user}}</strong>
           </a>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-            <li><a class="dropdown-item" href="#">Profile</a></li>
-            <li><a class="dropdown-item" href="#">Settings</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-danger" href="#">Logout</a></li>
+            <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Logout</a></li>
           </ul>
         </div>
       </div>
     </nav>
 
-    <div class="container">
-      <!-- Stats -->
-      <div class="row g-3 mb-4">
-        <div class="col-md-3 col-6">
-          <div class="card stat-card p-3">
-            <h6 class="text-muted">Clients Acquired</h6>
-            <h3>24</h3>
-            <div class="progress mt-2">
-              <div class="progress-bar bg-success" style="width: 48%"></div>
+    {% if messages %}
+    <div class="alert-container position-fixed start-50 translate-middle-x mt-4 w-75" style="z-index: 1050;">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} shadow-lg d-flex align-items-center p-3 fade show" role="alert" id="messageAlert">
+                {% if message.tags == 'success' %}
+                    <i class="fa fa-check-circle text-success me-2"></i>
+                {% elif message.tags == 'warning' %}
+                    <i class="fa fa-exclamation-triangle text-warning me-2"></i>
+                {% elif message.tags == 'error' or message.tags == 'danger' %}
+                    <i class="fa fa-times-circle text-danger me-2"></i>
+                {% else %}
+                    <i class="fa fa-info-circle text-info me-2"></i>
+                {% endif %}
+                <span class="w-100">{{ message }}</span>
+                <span class="w-10"></span>
+                <div class="progress mt-2 w-100" style="height: 3px;">
+                    <div class="progress-bar bg-{{ message.tags }}" role="progressbar" style="width: 100%;" id="progressBar"></div>
+                </div>
             </div>
-            <small class="text-muted">48% of quarterly goal</small>
-          </div>
-        </div>
-        <div class="col-md-3 col-6">
-          <div class="card stat-card p-3">
-            <h6 class="text-muted">Total Commission</h6>
-            <h3>$3,450</h3>
-            <div class="progress mt-2">
-              <div class="progress-bar bg-info" style="width: 69%"></div>
-            </div>
-            <small class="text-muted">Target: $5,000</small>
-          </div>
-        </div>
-        <div class="col-md-3 col-6">
-          <div class="card stat-card p-3">
-            <h6 class="text-muted">Active Leads</h6>
-            <h3>12</h3>
-            <div class="progress mt-2">
-              <div class="progress-bar bg-warning" style="width: 30%"></div>
-            </div>
-            <small class="text-muted">Working on 8 new</small>
-          </div>
-        </div>
-        <div class="col-md-3 col-6">
-          <div class="card stat-card p-3">
-            <h6 class="text-muted">Conversion Rate</h6>
-            <h3>58%</h3>
-            <div class="progress mt-2">
-              <div class="progress-bar bg-danger" style="width: 58%"></div>
-            </div>
-            <small class="text-muted">Goal: 70%</small>
-          </div>
-        </div>
-      </div>
+        {% endfor %}
+    </div>
 
-      <!-- Leaderboard -->
-      <div class="card leaderboard mb-4">
-        <div class="card-header bg-white">
-          <strong>Top Performers – Quarterly Bonus</strong>
-        </div>
-        <div class="card-body">
-          <table class="table table-borderless align-middle">
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>Agent</th>
-                <th>Clients Acquired</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="table-warning">
-                <td><span class="badge bg-warning text-dark fs-6">🥇 1</span></td>
-                <td>Alice Johnson</td>
-                <td>48</td>
-              </tr>
-              <tr class="table-secondary">
-                <td><span class="badge bg-secondary fs-6">🥈 2</span></td>
-                <td>Mark Smith</td>
-                <td>42</td>
-              </tr>
-              <tr class="table-danger">
-                <td><span class="badge bg-danger fs-6">🥉 3</span></td>
-                <td>Jane Williams</td>
-                <td>39</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var alertBox = document.getElementById('messageAlert');
+            var progressBar = document.getElementById('progressBar');
 
-      <!-- Lead Management -->
-      <div class="card mb-4">
-        <div class="card-header bg-white">
-          <strong>My Active Leads</strong>
-        </div>
-        <div class="card-body">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>Client Name</th>
-                <th>Status</th>
-                <th>Potential Value</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Michael Green</td>
-                <td><span class="badge bg-warning">Pending</span></td>
-                <td>$500</td>
-                <td><button class="btn btn-sm btn-success">Mark Won</button></td>
-              </tr>
-              <tr>
-                <td>Sara Lee</td>
-                <td><span class="badge bg-info">In Progress</span></td>
-                <td>$1,200</td>
-                <td><button class="btn btn-sm btn-success">Mark Won</button></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+            if (alertBox) {
+                var duration = 3000; // 3 seconds
+                var step = 50;
+                var width = 100;
 
-      <!-- Announcements -->
-      <div class="card mb-4">
-        <div class="card-header bg-white">
-          <strong>Program Announcements</strong>
-        </div>
-        <div class="card-body">
-          <div class="announcement mb-3">
-            <h6>🚀 New Bonus Structure</h6>
-            <p>Earn double commission for clients closed this month.</p>
+                var fadeOut = setInterval(function() {
+                    width -= (step / duration) * 100;
+                    progressBar.style.width = width + "%";
+
+                    if (width <= 0) {
+                        clearInterval(fadeOut);
+                        alertBox.style.transition = "opacity 0.5s";
+                        alertBox.style.opacity = "0";
+                        setTimeout(function() {
+                            alertBox.style.display = "none";
+                        }, 500);
+                    }
+                }, step);
+            }
+        });
+    </script>
+{% endif %}
+
+
+
+    <div class="container mb-4">
+      <div class="card stat-card p-3">
+      <h6 class="text-muted">Leaderboard</h6>
+      <table class="table table-borderless align-middle mb-0">
+      <tbody>
+      {% if top_specialist_1 and top_specialist_2 and top_specialist_3 %}
+        <tr class="table-warning">
+          <td class="p-2" style="border-right: 2px solid #fff;">
+            <span class="badge bg-warning text-dark fs-6">🥇 1</span>
+            <span class="fs-6">{{top_specialist_1.username}} </span>
+            <span class="fs-6"><b>Total clients:</b> {{top_specialist_1.client_acquired}}</span>
+          </td>
+          <td class="p-2" style="border-right: 2px solid #fff;">
+            <span class="badge bg-secondary fs-6">🥈 2</span>
+            <span class="fs-6">{{top_specialist_2.username}}</span>
+            <span class="fs-6"><b>Total clients:</b> {{top_specialist_2.client_acquired}}</span>
+          </td>
+          <td class="p-2">
+            <span class="badge bg-danger fs-6">🥉 3</span>
+            <span class="fs-6">{{top_specialist_3.username}}</span>
+            <span class="fs-6"><b>Total clients:</b> {{top_specialist_3.client_acquired}}</span>
+          </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="3" class="text-center text-muted">No leaderboard data available.</td>
+        </tr>
+      {% endif %}
+      </tbody>
+      </table>
+      </div>
+    </div>
+
+    <!-- Add Lead Button -->
+    <div class="d-flex justify-content-end container align-items-center mb-3">
+      <button class="btn btn-primary m-3" data-bs-toggle="modal" data-bs-target="#addLeadModal">
+        <i class="bi bi-plus-circle"></i> Add Lead
+      </button>
+      {% if user.admin %}
+      <button type="button" class="btn btn-primary m-3" data-bs-toggle="modal" data-bs-target="#uploadResourceModal">
+        <i class="bi bi-upload"></i> Upload Resource 
+      </button>
+      <button class="btn btn-primary m-3" data-bs-toggle="modal" data-bs-target="#newAnnouncementModal">
+        <i class="bi bi-megaphone"></i> New Announcement
+      </button>
+      {% endif %}
+      <!-- <a href="{% url 'chat_app' %}" class="m-3" style="text-decoration: none;" >WhatsApp <i class="bi bi-chat-left-text" style="font-size: 2rem;"></i></a> -->
+      <a href="{% url 'email_app' %}" class="m-3" style="text-decoration: none;" >Email <i class="bi bi-chat-left-text" style="font-size: 2rem;"></i></a>
+    </div>
+
+    <div class="modal fade" id="addLeadModal" tabindex="-1" aria-labelledby="addLeadModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addLeadModalLabel">Add New Lead</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="announcement">
-            <h6>🎯 Training Webinar</h6>
-            <p>Join us next Tuesday at 4 PM for lead conversion strategies.</p>
+          <div class="modal-body">
+            <form method="POST" action="{% url 'add_lead' %}">
+              {% csrf_token %}
+             {% for field in lead_form %}
+              <div class="mb-3">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                  <div class="text-danger">{{ field.errors }}</div>
+                {% endif %}
+              </div>
+              {% endfor %}
+              <div class="mb-3 text-end">
+                <button type="submit" class="btn btn-primary">Add Lead</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
     </div>
+
+
+    <div class="container"  style="font-size: 13px;" >
+      <!-- Stats -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6">
+          <div class="card stat-card p-3">
+            <h6 class="text-muted">Active Leads</h6>
+            <h3>{% if user.admin %} {{admin_active_leads}} {% else %} {{active_leads}} {% endif %}</h3>
+            <div class="progress mt-2">
+              <div class="progress-bar bg-warning" style="width: {% if user.admin %} {{admin_active_leads_percent}}%  {% else %} {{active_leads_percent}}% {% endif %}"></div>
+            </div>
+            {% if user.admin %}
+            <div class="d-flex justify-content-end">
+              <button class="btn btn-primary btn-sm m-1" data-bs-toggle="modal" data-bs-target="#activeLeadsModal" >View Details</button>
+            </div>
+            {% endif %}
+            <div class="modal fade" id="activeLeadsModal" tabindex="-1" aria-labelledby="activeLeadsModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="activeLeadsModalLabel">Active Leads Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    {% if admin_active_lead %}
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Phone</th>
+                          <th>Email</th>
+                          <th>Added by</th>
+                          <th>Notes</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for lds in admin_active_lead %}
+                        <tr>
+                          <td>{{ lds.name }}</td>
+                          <td>{{ lds.phone }}</td>
+                          <td>{{ lds.email }}</td>
+                          <td>{{ lds.created_by }}</td>
+                          <td>
+                            <i class="bi bi-info-circle" 
+                              data-bs-toggle="tooltip" 
+                              data-bs-placement="top" 
+                              title="{{ lds.notes }}">
+                            </i>
+                          </td>
+                          <td>
+                            <a href="{% url 'drop_lead' lds.id %}" class="btn btn-sm btn-danger"
+                              onclick="return confirm('Drop this lead?');">Drop</a>
+                            <a href="{% url 'convert_lead_to_client' lds.id %}" class="btn btn-sm btn-success"
+                              onclick="return confirm('Convert this lead to a new client');">Convert</a>
+                          </td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                    {% else %}
+                    <p class="text-center">No active leads available.</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="card stat-card p-3">
+            <h6 class="text-muted">Processed Leads</h6>
+            <h3>{% if user.admin %} {{admin_inactive_leads}} {% else %} {{inactive_leads}} {% endif %}</h3>
+            <div class="progress mt-2">
+              <div class="progress-bar bg-info" style="width: {% if user.admin %} {{admin_inactive_leads_percent}}%  {% else %} {{inactive_leads_percent}}% {% endif %}"></div>
+            </div>
+            {% if user.admin %}
+            <div class="d-flex justify-content-end">
+              <button class="btn btn-primary btn-sm m-1" data-bs-toggle="modal" data-bs-target="#inactiveLeadsModal" >View Details</button>
+            </div>
+            {% endif %}
+            <div class="modal fade" id="inactiveLeadsModal" tabindex="-1" aria-labelledby="inactiveLeadsModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="inactiveLeadsModalLabel">Inactive Leads Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    {% if admin_inactive_lead %}
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Phone</th>
+                          <th>Email</th>
+                          <th>Added by</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for lds in admin_inactive_lead %}
+                        <tr>
+                          <td>{{ lds.name }}</td>
+                          <td>{{ lds.phone }}</td>
+                          <td>{{ lds.email }}</td>
+                          <td>{{ lds.created_by }}</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                    {% else %}
+                    <p class="text-center">No processed leads available.</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="card stat-card p-3">
+            <h6 class="text-muted">Dropped Lead</h6>
+            <h3>{% if user.admin %} {{admin_drop_leads}} {% else %} {{drop_leads}} {% endif %}</h3>
+            <div class="progress mt-2">
+              <div class="progress-bar bg-danger" style="width: {% if user.admin %} {{admin_drop_leads_percent}}%  {% else %} {{drop_leads_percent}}% {% endif %}"></div>
+            </div>
+            {% if user.admin %}
+            <div class="d-flex justify-content-end">
+              <button class="btn btn-primary btn-sm m-1" data-bs-toggle="modal" data-bs-target="#droppedLeadModal" >View Details</button>
+            </div>
+            {% endif %}
+            <div class="modal fade" id="droppedLeadModal" tabindex="-1" aria-labelledby="droppedLeadModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="droppedLeadModalLabel">Dropped Leads Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    {% if admin_drop_lead %}
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Phone</th>
+                          <th>Email</th>
+                          <th>Added by</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for lds in admin_drop_lead %}
+                        <tr>
+                          <td>{{ lds.name }}</td>
+                          <td>{{ lds.phone }}</td>
+                          <td>{{ lds.email }}</td>
+                          <td>{{ lds.created_by }}</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                    {% else %}
+                    <p class="text-center">No dropped leads available.</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 col-6">
+          <div class="card stat-card p-3">
+            <h6 class="text-muted">Client Acquired</h6>
+            <h3>{% if user.admin %} {{admin_client_acquired}} {% else %} {{client_acquired}} {% endif %}</h3>
+            <div class="progress mt-2">
+              <div class="progress-bar bg-success" style="width: {% if user.admin %} {{admin_client_acquired_percent}}%  {% else %} {{client_acquired_percent}}% {% endif %}"></div>
+            </div>
+            {% if user.admin %}
+            <div class="d-flex justify-content-end">
+              <button class="btn btn-primary btn-sm m-1" data-bs-toggle="modal" data-bs-target="#clientAcquiredModal" >View Details</button>
+            </div>
+            {% endif %}
+            <div class="modal fade" id="clientAcquiredModal" tabindex="-1" aria-labelledby="clientAcquiredModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="clientAcquiredModalLabel">Client Acquired Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    {% if admin_client_acquireds %}
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Phone</th>
+                          <th>Email</th>
+                          <th>Added by</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for lds in admin_client_acquireds %}
+                        <tr>
+                          <td>{{ lds.name }}</td>
+                          <td>{{ lds.phone }}</td>
+                          <td>{{ lds.email }}</td>
+                          <td>{{ lds.created_by }}</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                    
+                    {% else %}
+                    <p class="text-center">No client acqired yet.</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+                
+
+        <div class="col-md-6 col-12">
+          <div class="card stat-card p-3">
+            {% if user.admin %} <h6 class="text-muted">Applicants</h6> {% else %} <h6 class="text-muted">Leads</h6> {% endif %}
+            <table class="table table-striped">
+              <tbody> 
+                {% if user.admin %}
+                  {% if not users %}
+                  <tr>
+                    <td colspan="4" class="text-center">No applicants available</td>
+                  </tr>
+                  {% endif %}
+                 {% for usr in users %}
+                  <tr>
+                    <td>{{ usr.full_name }}</td>
+                    <td class="text-end">
+                      <a href="{{ usr.cv.url }}" class="btn btn-primary btn-sm"
+                        onclick="return confirm('Are you sure you want to download CV?');"
+                        download>
+                        Download CV
+                      </a>
+                      <a href="{% url 'reject_synergy_application' usr.id %}" class="btn btn-sm btn-danger"
+                        onclick="return confirm('Reject this application?');">Reject</a>
+                      <a href="{% url 'approve_synergy_application' usr.id %}" class="btn btn-sm btn-success"
+                        onclick="return confirm('Approve this application');">Approve</a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+
+                  {% else %}
+                  {% if not leads %}
+                  <tr>
+                    <td colspan="4" class="text-center">No Leads available</td>
+                  </tr>
+                  {% endif %}
+
+                  {% for lead in leads %}
+                  <tr>
+                  <td>{{ lead.name }}</td>
+                  <td>
+                    {% if lead.client %}
+                      <span class="badge bg-success">Client</span>
+                    {% elif lead.drop %}
+                      <span class="badge bg-danger">Dropped</span>
+                    {% else %}
+                    {% if lead.status %}
+                      <span class="badge bg-warning">Active</span>
+                    {% else %}
+                      <span class="badge bg-secondary">Inactive</span>
+                    {% endif %}
+                    {% endif %}
+                  </td>
+                  </tr>
+                  {% endfor %}
+                  
+                  {% endif %}
+                
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+            <div class="col-md-6 col-12">
+              <div class="col-md-12 col-12 m-1">
+                <div class="card stat-card p-3">
+                  <h6 class="text-muted">Announcements</h6>
+                  <div class="announcement">
+                      {% if announcements %}
+                        <h5>{{ announcements.title }}</h5>
+                        <p>{{ announcements.content }}</p>
+                      {% else %}
+                        No announcements available.
+                      {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-12 col-12 m-1">
+                <div class="card stat-card p-3">
+                  <h6 class="text-muted">Resource Center</h6>
+                  {% if resources %}
+                  <div class="row">
+                    {% for resource in resources %}
+                    <div class="col-md-4 mb-3">
+                    <div class="h-100">
+                      <div class="card-body text-center">
+                      <a href="{{ resource.file.url }}" class="btn btn-primary btn-sm"
+                        onclick="return confirm('Are you sure you want to download {{ resource.name }}?');"
+                        download>
+                        {{ resource.title }}
+                      </a>
+                      {% if user.admin %}
+                        <a href="{% url 'delete_resource' resource.id %}" class="btn btn-sm btn-danger m-1"
+                        onclick="return confirm('Delete resource?');">Delete</a>
+                      {% endif %}
+                      </div>
+                    </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                  {% else %}
+                  <p class="text-center">No resources available.</p>
+                  {% endif %}
+                          
+                </div>
+              </div>
+            </div>
+    </div>
+
+
+    </div>
   </div>
 
+  <!-- Upload Resource Modal -->
+    <div class="modal fade" id="uploadResourceModal" tabindex="-1" aria-labelledby="uploadResourceModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="uploadResourceModalLabel">Upload Resource</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form method="POST" enctype="multipart/form-data" action="{% url 'upload_resource' %}">
+            {% csrf_token %}
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="resourceTitle" class="form-label">Resource Title</label>
+                <input type="text" class="form-control" id="resourceTitle" name="title" required>
+              </div>
+              <div class="mb-3">
+                <label for="resourceFile" class="form-label">Resource File</label>
+                <input type="file" class="form-control" id="resourceFile" name="file" accept=".pdf,.docx,.pptx" required>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">Upload</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Modal Announcement Form -->
+    <div class="modal fade" id="newAnnouncementModal" tabindex="-1" aria-labelledby="newAnnouncementModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="newAnnouncementModalLabel">New Announcement</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form method="POST" action="{% url 'add_announcement' %}">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label for="announcementTitle" class="form-label">Title</label>
+                <input type="text" class="form-control" id="announcementTitle" name="title" required>
+              </div>
+              <div class="mb-3">
+                <label for="announcementContent" class="form-label">Content</label>
+                <textarea class="form-control" id="announcementContent" name="content" rows="3" required></textarea>
+              </div>
+              <div class="text-end">
+                <button type="submit" class="btn btn-primary">Post Announcement</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+  });
+</script>
 </body>
 </html>

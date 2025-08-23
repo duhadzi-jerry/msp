@@ -128,6 +128,13 @@ EMAIL_HOST_PASSWORD = 'the company&supportmsp'
 
 DEFAULT_FROM_EMAIL = "support@msp.mirjy.com" 
 
+
+# settings.py
+WHATSAPP_PHONE_NUMBER_ID = "your_phone_number_id"
+WHATSAPP_ACCESS_TOKEN = "your_permanent_access_token"
+WHATSAPP_VERIFY_TOKEN = "your_webhook_secret"
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

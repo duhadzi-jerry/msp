@@ -2,4 +2,12 @@ from django.contrib import admin
 from .models import *
 # Register your models here.
 
+admin.site.register(User)
 admin.site.register(SynergyApplication)
+admin.site.register(Lead)
+admin.site.register(Resource)
+admin.site.register(Announcement)
+admin.site.register(Contact)
+admin.site.register(Message)
+admin.site.register(Emails)
+admin.site.register(EmailMessage)
