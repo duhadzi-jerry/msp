@@ -17,6 +17,7 @@ phone_validator = RegexValidator(
 class User(BaseUser):
     hold = models.BooleanField(default=False)
     admin = models.BooleanField(default=False)
+    super_admin = models.BooleanField(default=False)
     assign_to = models.CharField(max_length=255)
 
     def save(self, *args, **kwargs):
@@ -94,7 +95,7 @@ class Emails(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.name} ({self.email})"
+        return f"{self.name}, {self.user} ({self.email})"
     
     @property
     def new_message_count(self):
@@ -120,4 +121,4 @@ class EmailMessage(models.Model):
     created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE, related_name='email_sender')
 
     def __str__(self):
-        return f"{self.direction} - {self.email.name}: {self.content[:30]}"
+        return f"{self.direction} - {self.email.name}, {self.created_by}: {self.content[:30]}"

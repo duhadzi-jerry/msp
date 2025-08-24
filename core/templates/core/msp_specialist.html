@@ -147,7 +147,7 @@
       <button class="btn btn-primary m-3" data-bs-toggle="modal" data-bs-target="#addLeadModal">
         <i class="bi bi-plus-circle"></i> Add Lead
       </button>
-      {% if user.admin %}
+      {% if user.admin or user.super_admin %}
       <button type="button" class="btn btn-primary m-3" data-bs-toggle="modal" data-bs-target="#uploadResourceModal">
         <i class="bi bi-upload"></i> Upload Resource 
       </button>
@@ -194,11 +194,11 @@
         <div class="col-md-3 col-6">
           <div class="card stat-card p-3">
             <h6 class="text-muted">Active Leads</h6>
-            <h3>{% if user.admin %} {{admin_active_leads}} {% else %} {{active_leads}} {% endif %}</h3>
+            <h3>{% if user.super_admin %} {{super_admin_active_leads}} {% elif user.admin %} {{admin_active_leads}} {% else %} {{active_leads}} {% endif %}</h3>
             <div class="progress mt-2">
-              <div class="progress-bar bg-warning" style="width: {% if user.admin %} {{admin_active_leads_percent}}%  {% else %} {{active_leads_percent}}% {% endif %}"></div>
+              <div class="progress-bar bg-warning" style="width: {% if user.super_admin %} {{super_admin_active_leads_percent}}% {% elif user.admin %} {{admin_active_leads_percent}}%  {% else %} {{active_leads_percent}}% {% endif %}"></div>
             </div>
-            {% if user.admin %}
+            {% if user.admin or user.super_admin %}
             <div class="d-flex justify-content-end">
               <button class="btn btn-primary btn-sm m-1" data-bs-toggle="modal" data-bs-target="#activeLeadsModal" >View Details</button>
             </div>
@@ -211,7 +211,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
-                    {% if admin_active_lead %}
+                    {% if user.admin and admin_active_lead %}
                     <table class="table table-striped">
                       <thead>
                         <tr>
@@ -224,6 +224,41 @@
                       </thead>
                       <tbody>
                         {% for lds in admin_active_lead %}
+                        <tr>
+                          <td>{{ lds.name }}</td>
+                          <td>{{ lds.phone }}</td>
+                          <td>{{ lds.email }}</td>
+                          <td>{{ lds.created_by }}</td>
+                          <td>
+                            <i class="bi bi-info-circle" 
+                              data-bs-toggle="tooltip" 
+                              data-bs-placement="top" 
+                              title="{{ lds.notes }}">
+                            </i>
+                          </td>
+                          <td>
+                            <a href="{% url 'drop_lead' lds.id %}" class="btn btn-sm btn-danger"
+                              onclick="return confirm('Drop this lead?');">Drop</a>
+                            <a href="{% url 'convert_lead_to_client' lds.id %}" class="btn btn-sm btn-success"
+                              onclick="return confirm('Convert this lead to a new client');">Convert</a>
+                          </td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                    {% elif user.super_admin and super_admin_active_lead %}
+                      <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Phone</th>
+                          <th>Email</th>
+                          <th>Added by</th>
+                          <th>Notes</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for lds in super_admin_active_lead %}
                         <tr>
                           <td>{{ lds.name }}</td>
                           <td>{{ lds.phone }}</td>
@@ -259,11 +294,11 @@
         <div class="col-md-3 col-6">
           <div class="card stat-card p-3">
             <h6 class="text-muted">Processed Leads</h6>
-            <h3>{% if user.admin %} {{admin_inactive_leads}} {% else %} {{inactive_leads}} {% endif %}</h3>
+            <h3>{% if user.super_admin %} {{super_admin_inactive_leads}} {% elif user.admin %} {{admin_inactive_leads}} {% else %} {{inactive_leads}} {% endif %}</h3>
             <div class="progress mt-2">
-              <div class="progress-bar bg-info" style="width: {% if user.admin %} {{admin_inactive_leads_percent}}%  {% else %} {{inactive_leads_percent}}% {% endif %}"></div>
+              <div class="progress-bar bg-info" style="width: {% if user.super_admin %} {{super_admin_inactive_leads_percent}}% {% elif user.admin %} {{admin_inactive_leads_percent}}%  {% else %} {{inactive_leads_percent}}% {% endif %}"></div>
             </div>
-            {% if user.admin %}
+            {% if user.admin or user.super_admin %}
             <div class="d-flex justify-content-end">
               <button class="btn btn-primary btn-sm m-1" data-bs-toggle="modal" data-bs-target="#inactiveLeadsModal" >View Details</button>
             </div>
@@ -276,7 +311,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
-                    {% if admin_inactive_lead %}
+                    {% if user.admin and admin_inactive_lead %}
                     <table class="table table-striped">
                       <thead>
                         <tr>
@@ -288,6 +323,27 @@
                       </thead>
                       <tbody>
                         {% for lds in admin_inactive_lead %}
+                        <tr>
+                          <td>{{ lds.name }}</td>
+                          <td>{{ lds.phone }}</td>
+                          <td>{{ lds.email }}</td>
+                          <td>{{ lds.created_by }}</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                    {% elif user.super_admin and super_admin_inactive_lead %}
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Phone</th>
+                          <th>Email</th>
+                          <th>Added by</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for lds in super_admin_inactive_lead %}
                         <tr>
                           <td>{{ lds.name }}</td>
                           <td>{{ lds.phone }}</td>
@@ -310,11 +366,11 @@
         <div class="col-md-3 col-6">
           <div class="card stat-card p-3">
             <h6 class="text-muted">Dropped Lead</h6>
-            <h3>{% if user.admin %} {{admin_drop_leads}} {% else %} {{drop_leads}} {% endif %}</h3>
+            <h3>{% if user.super_admin %} {{super_admin_drop_leads}} {% elif user.admin %} {{admin_drop_leads}} {% else %} {{drop_leads}} {% endif %}</h3>
             <div class="progress mt-2">
-              <div class="progress-bar bg-danger" style="width: {% if user.admin %} {{admin_drop_leads_percent}}%  {% else %} {{drop_leads_percent}}% {% endif %}"></div>
+              <div class="progress-bar bg-danger" style="width: {% if user.super_admin %} {{super_admin_drop_leads_percent}}% {% elif user.admin %} {{admin_drop_leads_percent}}%  {% else %} {{drop_leads_percent}}% {% endif %}"></div>
             </div>
-            {% if user.admin %}
+            {% if user.admin or user.super_admin %}
             <div class="d-flex justify-content-end">
               <button class="btn btn-primary btn-sm m-1" data-bs-toggle="modal" data-bs-target="#droppedLeadModal" >View Details</button>
             </div>
@@ -327,7 +383,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
-                    {% if admin_drop_lead %}
+                    {% if user.admin and admin_drop_lead %}
                     <table class="table table-striped">
                       <thead>
                         <tr>
@@ -339,6 +395,27 @@
                       </thead>
                       <tbody>
                         {% for lds in admin_drop_lead %}
+                        <tr>
+                          <td>{{ lds.name }}</td>
+                          <td>{{ lds.phone }}</td>
+                          <td>{{ lds.email }}</td>
+                          <td>{{ lds.created_by }}</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                    {% elif user.super_admin and super_admin_drop_lead %}
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Phone</th>
+                          <th>Email</th>
+                          <th>Added by</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for lds in super_admin_drop_lead %}
                         <tr>
                           <td>{{ lds.name }}</td>
                           <td>{{ lds.phone }}</td>
@@ -360,11 +437,11 @@
         <div class="col-md-3 col-6">
           <div class="card stat-card p-3">
             <h6 class="text-muted">Client Acquired</h6>
-            <h3>{% if user.admin %} {{admin_client_acquired}} {% else %} {{client_acquired}} {% endif %}</h3>
+            <h3>{% if user.super_admin %} {{super_admin_client_acquired}} {% elif user.admin %} {{admin_client_acquired}} {% else %} {{client_acquired}} {% endif %}</h3>
             <div class="progress mt-2">
-              <div class="progress-bar bg-success" style="width: {% if user.admin %} {{admin_client_acquired_percent}}%  {% else %} {{client_acquired_percent}}% {% endif %}"></div>
+              <div class="progress-bar bg-success" style="width: {% if user.super_admin %} {{super_admin_client_acquired_percent}}% {% elif user.admin %} {{admin_client_acquired_percent}}%  {% else %} {{client_acquired_percent}}% {% endif %}"></div>
             </div>
-            {% if user.admin %}
+            {% if user.admin or user.super_admin %}
             <div class="d-flex justify-content-end">
               <button class="btn btn-primary btn-sm m-1" data-bs-toggle="modal" data-bs-target="#clientAcquiredModal" >View Details</button>
             </div>
@@ -377,7 +454,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
-                    {% if admin_client_acquireds %}
+                    {% if user.admin and admin_client_acquireds %}
                     <table class="table table-striped">
                       <thead>
                         <tr>
@@ -398,7 +475,27 @@
                         {% endfor %}
                       </tbody>
                     </table>
-                    
+                    {% elif user.super_admin and super_admin_client_acquireds %}
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Phone</th>
+                          <th>Email</th>
+                          <th>Added by</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for lds in super_admin_client_acquireds %}
+                        <tr>
+                          <td>{{ lds.name }}</td>
+                          <td>{{ lds.phone }}</td>
+                          <td>{{ lds.email }}</td>
+                          <td>{{ lds.created_by }}</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
                     {% else %}
                     <p class="text-center">No client acqired yet.</p>
                     {% endif %}
@@ -412,10 +509,10 @@
 
         <div class="col-md-6 col-12">
           <div class="card stat-card p-3">
-            {% if user.admin %} <h6 class="text-muted">Applicants</h6> {% else %} <h6 class="text-muted">Leads</h6> {% endif %}
+            {% if user.admin or user.super_admin %} <h6 class="text-muted">Applicants</h6> {% else %} <h6 class="text-muted">Leads</h6> {% endif %}
             <table class="table table-striped">
               <tbody> 
-                {% if user.admin %}
+                {% if user.admin or user.super_admin %}
                   {% if not users %}
                   <tr>
                     <td colspan="4" class="text-center">No applicants available</td>
@@ -425,7 +522,7 @@
                   <tr>
                     <td>{{ usr.full_name }}</td>
                     <td class="text-end">
-                      <a href="{{ usr.cv.url }}" class="btn btn-primary btn-sm"
+                      <a href="{% if usr.cv %} {{ usr.cv.url }} {% endif %}" class="btn btn-primary btn-sm"
                         onclick="return confirm('Are you sure you want to download CV?');"
                         download>
                         Download CV
@@ -471,56 +568,212 @@
           </div>
         </div>
 
-            <div class="col-md-6 col-12">
-              <div class="col-md-12 col-12 m-1">
-                <div class="card stat-card p-3">
-                  <h6 class="text-muted">Announcements</h6>
-                  <div class="announcement">
-                      {% if announcements %}
-                        <h5>{{ announcements.title }}</h5>
-                        <p>{{ announcements.content }}</p>
-                      {% else %}
-                        No announcements available.
-                      {% endif %}
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-12 col-12 m-1">
-                <div class="card stat-card p-3">
-                  <h6 class="text-muted">Resource Center</h6>
-                  {% if resources %}
-                  <div class="row">
-                    {% for resource in resources %}
-                    <div class="col-md-4 mb-3">
-                    <div class="h-100">
-                      <div class="card-body text-center">
-                      <a href="{{ resource.file.url }}" class="btn btn-primary btn-sm"
-                        onclick="return confirm('Are you sure you want to download {{ resource.name }}?');"
-                        download>
-                        {{ resource.title }}
-                      </a>
-                      {% if user.admin %}
-                        <a href="{% url 'delete_resource' resource.id %}" class="btn btn-sm btn-danger m-1"
-                        onclick="return confirm('Delete resource?');">Delete</a>
-                      {% endif %}
-                      </div>
-                    </div>
-                    </div>
-                    {% endfor %}
-                  </div>
+        <div class="col-md-6 col-12">
+          <div class="col-md-12 col-12 m-1">
+            <div class="card stat-card p-3">
+              <h6 class="text-muted">Announcements</h6>
+              <div class="announcement">
+                  {% if announcements %}
+                    <h5>{{ announcements.title }}</h5>
+                    <p>{{ announcements.content }}</p>
                   {% else %}
-                  <p class="text-center">No resources available.</p>
+                    No announcements available.
                   {% endif %}
-                          
-                </div>
               </div>
             </div>
-    </div>
+          </div>
+
+          <div class="col-md-12 col-12 m-1">
+            <div class="card stat-card p-3">
+              <h6 class="text-muted">Resource Center</h6>
+              {% if resources %}
+              <div class="row">
+                {% for resource in resources %}
+                <div class="col-md-4 mb-3">
+                <div class="h-100">
+                  <div class="card-body text-center">
+                  <a href="{{ resource.file.url }}" class="btn btn-primary btn-sm"
+                    onclick="return confirm('Are you sure you want to download {{ resource.name }}?');"
+                    download>
+                    {{ resource.title }}
+                  </a>
+                  {% if user.admin or user.super_admin %}
+                    <a href="{% url 'delete_resource' resource.id %}" class="btn btn-sm btn-danger m-1"
+                    onclick="return confirm('Delete resource?');">Delete</a>
+                  {% endif %}
+                  </div>
+                </div>
+                </div>
+                {% endfor %}
+              </div>
+              {% else %}
+              <p class="text-center">No resources available.</p>
+              {% endif %}
+                      
+            </div>
+          </div>
+        </div>
+{% if user.super_admin %}
+        <div class="row m-1">
+          <div class="col-md-6 col-12">
+            <div class="card stat-card p-3">
+            
+            <form method="post" action="{% url 'assign_users' %}">
+                {% csrf_token %}
+                <div class="d-flex justify-content-between align-items-center">
+                  <h6 class="text-muted" >Assign Users</h6>
+                  <div>
+                      <input type="checkbox" id="checkAll">
+                      <label for="checkAll"><strong>Check All Users</strong></label>
+                  </div>
+                </div>
+                <div class="mb-3">
+                    <div class="table-responsive border rounded">
+                        <table class="table table-striped align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Badge</th>
+                                    <th>User</th>
+                                    <th>Assigned To</th>
+                                    <th>Select</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in all_cas_users %}
+                                    <tr>
+                                        <td>
+                                          {% if user.admin %}
+                                                <span class="badge bg-success">Admin</span>
+                                            {% else %}
+                                                <span class="badge bg-dark">CAS</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ user.username }}
+                                        </td>
+                                        <td>
+                                            {% if user.assign_to %}
+                                                {{ user.assign_to }}
+                                            {% else %}
+                                                <span class="text-muted">Not Assigned</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <input class="form-check-input user-checkbox" type="checkbox" 
+                                                  name="users" id="user{{ user.id }}" value="{{ user.username }}">
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">No CAS users available</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Assign To (Single User) -->
+                <div class="mb-3">
+                    <label for="assign_to" class="form-label">Assign To</label>
+                    <select name="assign_to" id="assign_to" class="form-control" required>
+                        <option value="">-- Select One --</option>
+                        {% for user in all_admin_users %}
+                            <option value="{{ user.id }}">{{ user.username }}</option> 
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Assign</button>
+            </form>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-12">
+            <div class="card stat-card p-3">
+            <h6 class="text-muted" >Assign Position</h6>
+            <form method="post" action="{% url 'assign_users' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <div class="table-responsive border rounded">
+                        <table class="table table-striped align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Badge</th>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in all_cas_users %}
+                                    <tr>
+                                        <td>
+                                          {% if user.admin %}
+                                                <span class="badge bg-success">CAS Lead</span>
+                                            {% else %}
+                                                <span class="badge bg-dark">CAS</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ user.username }}
+                                        </td>
+                                        <td>
+                                          <a href="{% url 'assign_lead_position' user.id %}" class="btn btn-sm btn-primary" >Set as CAS Lead</a>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted">No CAS available</td>
+                                    </tr>
+                                {% endfor %}
+                                {% for user in all_admin_users %}
+                                    <tr>
+                                        <td>
+                                          {% if user.admin %}
+                                                <span class="badge bg-success">CAS Lead</span>
+                                            {% else %}
+                                                <span class="badge bg-dark">CAS</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ user.username }}
+                                        </td>
+                                        <td>
+                                          <a href="{% url 'assign_cas_position' user.id %}" class="btn btn-sm btn-primary" >Set as CAS</a>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted">No CAS Lead available</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </form>
+            </div>
+          </div>
+        </div>
+{% endif %}
 
 
+
+      </div>
     </div>
   </div>
+
+ 
+
+<script>
+    // Check/Uncheck All
+    document.getElementById("checkAll").addEventListener("change", function() {
+        const checkboxes = document.querySelectorAll(".user-checkbox");
+        checkboxes.forEach(cb => cb.checked = this.checked);
+    });
+</script>
+
+
 
   <!-- Upload Resource Modal -->
     <div class="modal fade" id="uploadResourceModal" tabindex="-1" aria-labelledby="uploadResourceModalLabel" aria-hidden="true">

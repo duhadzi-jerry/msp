@@ -37,6 +37,9 @@ urlpatterns = [
     path('delete_resource/<int:resource_id>/', views.delete_resource, name='delete_resource'),
     path('delete_announcement/<int:announcement_id>/', views.delete_announcement, name='delete_announcement'),
     path('add_announcement/', views.add_announcement, name='add_announcement'),
+    path('assign_users/', views.assign_users, name='assign_users'),
+    path('assign_lead_position/<int:user_id>/', views.assign_lead_position, name='assign_lead_position'),
+    path('assign_cas_position/<int:user_id>/', views.assign_cas_position, name='assign_cas_position'),
 
     path("chat_app/", views.chat_app, name="chat_app"),
     path("email_app/", views.email_app, name="email_app"),

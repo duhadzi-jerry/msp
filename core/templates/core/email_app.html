@@ -193,17 +193,43 @@
             </button>
         </div>
         <div class="contact-list mt-2" >
-          {% for contact in emails %}
-            <div class="d-flex align-items-center contact-item" data-id="{{contact.id}}" onclick="selectContact({{contact.id}})">
-                <div class="avatar" style="background:var(--mirjy-blue)"> {{contact.new_message_count}}</div>
-                <div class="flex-grow-1">
-                    <div class="fw-bold chatName">{{contact.name}}</div>
-                    <div class="muted chatPhone" style="font-size:13px">{{contact.email}}</div>
-                </div>
-            </div>
-        {% empty %}
-            <p class="p-3 text-muted">No emails yet.</p>
-        {% endfor %}
+          {% if user.super_admin %}
+            {% for contact in super_admin_emails %}
+              <div class="d-flex align-items-center contact-item" data-id="{{contact.id}}" onclick="selectContact({{contact.id}})">
+                  <div class="avatar" style="background:var(--mirjy-blue)"> {{contact.new_message_count}}</div>
+                  <div class="flex-grow-1">
+                      <div class="fw-bold chatName">{{contact.name}} {% if contact.user.username == user.username %} - Personal {% else %} - {{contact.user}} {% endif %}</div>
+                      <div class="muted chatPhone" style="font-size:13px">{{contact.email}}</div>
+                  </div>
+              </div>
+            {% empty %}
+                <p class="p-3 text-muted">No emails yet.</p>
+            {% endfor %}
+          {% elif user.admin %}
+            {% for contact in admin_emails %}
+              <div class="d-flex align-items-center contact-item" data-id="{{contact.id}}" onclick="selectContact({{contact.id}})">
+                  <div class="avatar" style="background:var(--mirjy-blue)"> {{contact.new_message_count}}</div>
+                  <div class="flex-grow-1">
+                      <div class="fw-bold chatName">{{contact.name}} {% if user.username == contact.user.username %} - Personal {% else %} - {{contact.user}} {% endif %} </div>
+                      <div class="muted chatPhone" style="font-size:13px">{{contact.email}}</div>
+                  </div>
+              </div>
+            {% empty %}
+                <p class="p-3 text-muted">No emails yet.</p>
+            {% endfor %}
+          {% else %}
+            {% for contact in emails %}
+              <div class="d-flex align-items-center contact-item" data-id="{{contact.id}}" onclick="selectContact({{contact.id}})">
+                  <div class="avatar" style="background:var(--mirjy-blue)"> {{contact.new_message_count}}</div>
+                  <div class="flex-grow-1">
+                      <div class="fw-bold chatName">{{contact.name}} </div>
+                      <div class="muted chatPhone" style="font-size:13px">{{contact.email}}</div>
+                  </div>
+              </div>
+            {% empty %}
+                <p class="p-3 text-muted">No emails yet.</p>
+            {% endfor %}
+          {% endif %}
         </div>
       </aside>
 

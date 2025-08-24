@@ -24,7 +24,7 @@ from django.core.mail import EmailMultiAlternatives, get_connection
 import imaplib, email
 from email.utils import parseaddr, parsedate_to_datetime
 from django.utils import timezone
-
+from django.db.models import Q
 from .models import Emails, EmailMessage
 
 
@@ -162,19 +162,25 @@ def msp_specialist(request):
     users = SynergyApplication.objects.filter(status=False)
     leads = Lead.objects.filter(created_by=User.objects.get(username=request.user))
     lead_form = LeadForm()
+    
 
     admin_leads_count = Lead.objects.filter(created_by__assign_to=request.user.username)
 
+    super_admin_leads = Lead.objects.all()
 
     # Pagination
     paginator = Paginator(leads, 10)  # Show 10 leads per page
-    page_number = request.GET.get('page')
-    leads_page = paginator.get_page(page_number)
+    lead_page_number = request.GET.get('page')
+    leads_page = paginator.get_page(lead_page_number)
 
     # Pagination
-    paginator = Paginator(admin_leads_count, 1)  # Show 10 leads per page
-    page_number = request.GET.get('page')
-    admin_leads_page = paginator.get_page(page_number)
+    paginator = Paginator(admin_leads_count, 10)  # Show 10 leads per page
+    admin_page_number = request.GET.get('page')
+    admin_leads_page = paginator.get_page(admin_page_number)
+
+    paginator = Paginator(super_admin_leads, 10)  # Show 10 users per page
+    super_admin_page_number = request.GET.get('page')
+    super_admin_page = paginator.get_page(super_admin_page_number)
 
     paginator = Paginator(users, 10)  # Show 10 users per page
     users_page_number = request.GET.get('page')
@@ -195,8 +201,11 @@ def msp_specialist(request):
     context = {
         'user': User.objects.get(username=request.user),
         'users': users_page,
+        'all_cas_users': User.objects.filter(admin=False, super_admin=False),
+        'all_admin_users': User.objects.filter(admin=True, super_admin=False),
         'leads': leads_page,
         'admin_leads':admin_leads_page,
+        'super_admin_leads':super_admin_page,
         'lead_form': lead_form,
         'resources': resources,
         'announcements': announcements,
@@ -224,6 +233,19 @@ def msp_specialist(request):
         'admin_client_acquireds': admin_leads_count.filter(client=True),
         'admin_client_acquired': admin_leads_count.filter(client=True).count(),
         'admin_client_acquired_percent': (admin_leads_count.filter(client=True).count() / admin_leads_count.count() * 100) if admin_leads_count.count() > 0 else 0,
+
+        'super_admin_active_lead': super_admin_leads.filter(status=True),
+        'super_admin_active_leads': super_admin_leads.filter(status=True).count(),
+        'super_admin_active_leads_percent': (super_admin_leads.filter(status=True).count() / super_admin_leads.count() * 100) if super_admin_leads.count() > 0 else 0,
+        'super_admin_inactive_lead': super_admin_leads.filter(status=False),
+        'super_admin_inactive_leads': super_admin_leads.filter(status=False).count(),
+        'super_admin_inactive_leads_percent': (super_admin_leads.filter(status=False).count() / super_admin_leads.count() * 100) if super_admin_leads.count() > 0 else 0,
+        'super_admin_drop_lead': super_admin_leads.filter(drop=True),
+        'super_admin_drop_leads': super_admin_leads.filter(drop=True).count(),
+        'super_admin_drop_leads_percent': (super_admin_leads.filter(drop=True).count() / super_admin_leads.count() * 100) if super_admin_leads.count() > 0 else 0,
+        'super_admin_client_acquireds': super_admin_leads.filter(client=True),
+        'super_admin_client_acquired': super_admin_leads.filter(client=True).count(),
+        'super_admin_client_acquired_percent': (super_admin_leads.filter(client=True).count() / super_admin_leads.count() * 100) if super_admin_leads.count() > 0 else 0,
 
 
     }
@@ -458,8 +480,53 @@ def add_announcement(request):
         messages.success(request, 'Announcement added successfully.', extra_tags='alert alert-success')
         return redirect('msp_specialist')
 
+def assign_users(request):
+    if request.method == "POST":
+        selected_usernames = request.POST.getlist("users")
+        assign_to_id = request.POST.get("assign_to")
+
+        if not selected_usernames:
+            messages.error(request, "Please select at least one user to assign.", extra_tags='alert alert-warning')
+            return redirect("msp_specialist")
+
+        if not assign_to_id:
+            messages.error(request, "Please select a user to assign to.", extra_tags='alert alert-warning')
+            return redirect("msp_specialist")
+
+        try:
+            assign_to_user = User.objects.get(id=assign_to_id)
+        except User.DoesNotExist:
+            messages.error(request, "The selected assign-to user does not exist.", extra_tags='alert alert-warning')
+            return redirect("msp_specialist")
+
+        # Update assignments
+        updated_count = 0
+        for username in selected_usernames:
+            try:
+                user = User.objects.get(username=username)
+                user.assign_to = assign_to_user.username
+                user.save()
+                updated_count += 1
+            except User.DoesNotExist:
+                continue
+
+        messages.success(request, f"Successfully assigned {updated_count} user(s) to {assign_to_user.username}.", extra_tags='alert alert-success')
+        return redirect("msp_specialist")
 
 
+def assign_lead_position(request, user_id):
+    user = User.objects.get(id=user_id)
+    user.admin = True
+    user.save()
+    messages.success(request, f"{user.username} has been assigned as CAS Lead.", extra_tags='alert alert-success')
+    return redirect('msp_specialist')
+
+def assign_cas_position(request, user_id):
+    user = User.objects.get(id=user_id)
+    user.admin = False
+    user.save()
+    messages.success(request, f"{user.username} has been assigned as CAS.", extra_tags='alert alert-success')
+    return redirect('msp_specialist')
 # -------------------
 # List Contacts
 # -------------------
@@ -473,7 +540,17 @@ def chat_app(request):
 def email_app(request):
     get_mailbox_emails(request, 'mirjy.com', 'client-acquisition@mirjy.com', 'the company&cas')
     emails = Emails.objects.filter(user=request.user).order_by("-created_at")
-    return render(request, "core/email_app.html", {"emails": emails,})
+    admin_emails = Emails.objects.filter(Q(user=request.user) | Q(user__assign_to=request.user.username)).order_by("-created_at")
+    super_admin_emails = Emails.objects.all().order_by("-created_at")
+
+    context = {
+        "user": User.objects.get(username=request.user),
+        "emails": emails,
+        "admin_emails": admin_emails,
+        "super_admin_emails": super_admin_emails,
+
+    }
+    return render(request, "core/email_app.html", context)
 
 def add_contact(request):
     if request.method == "POST":
@@ -667,7 +744,7 @@ def get_messages(request, contact_id):
 
 @login_required
 def get_emails(request, contact_id):
-    email_obj = get_object_or_404(Emails, id=contact_id, user=request.user)
+    email_obj = get_object_or_404(Emails, id=contact_id)
 
     # Mark all incoming messages as read
     email_obj.email_messages.filter(direction="incoming", read=False).update(read=True)
