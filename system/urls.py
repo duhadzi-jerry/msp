@@ -40,6 +40,7 @@ urlpatterns = [
     path('assign_users/', views.assign_users, name='assign_users'),
     path('assign_lead_position/<int:user_id>/', views.assign_lead_position, name='assign_lead_position'),
     path('assign_cas_position/<int:user_id>/', views.assign_cas_position, name='assign_cas_position'),
+    path('delete_lead/<int:lead_id>/', views.delete_lead, name='delete_lead'),
 
     path("chat_app/", views.chat_app, name="chat_app"),
     path("email_app/", views.email_app, name="email_app"),

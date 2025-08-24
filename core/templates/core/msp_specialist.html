@@ -521,6 +521,13 @@
                  {% for usr in users %}
                   <tr>
                     <td>{{ usr.full_name }}</td>
+                    <td>
+                      <i class="bi bi-info-circle"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-title="{{ usr.pitch }}">
+                      </i>
+                    </td>
                     <td class="text-end">
                       <a href="{% if usr.cv %} {{ usr.cv.url }} {% endif %}" class="btn btn-primary btn-sm"
                         onclick="return confirm('Are you sure you want to download CV?');"
@@ -557,6 +564,10 @@
                       <span class="badge bg-secondary">Inactive</span>
                     {% endif %}
                     {% endif %}
+                  </td>
+                  <td>
+                    <a href="{% url 'delete_lead' lds.id %}" class="btn btn-sm btn-danger"
+                              onclick="return confirm('Delete this lead?');">Delete</a>
                   </td>
                   </tr>
                   {% endfor %}

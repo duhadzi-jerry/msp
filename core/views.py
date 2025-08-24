@@ -310,12 +310,19 @@ def approve_synergy_application(request, application_id):
         user = User.objects.get(email=application.email)
 
         # Send approval email
-        content = f"""
-                We are excited to imform you that you have being approved for the Mirjy Synergy Program.
-                We will be in touch with you shortly to discuss the next steps.
-                Your login information:
+        m1 = f"""
+                We are excited to imform you that you have been approved for the Mirjy Synergy Program.
+                We will be in touch with you shortly to discuss the next steps. For now, you can log into your account using your credentials.
+            """
+        m2 = f"""
+               Platform: https://msp.mirjy.com
+            """
+        m3 = f"""
+               Your login information:
                 Username: {user.username}, Password: welcomeCAS
             """
+
+        content = m1 + m2 + m3
 
             # Render HTML
         html_message = render_to_string(
@@ -425,6 +432,17 @@ def drop_lead(request, lead_id):
         lead.save()
 
         messages.success(request, 'Lead dropped successfully.', extra_tags='alert alert-success')
+    except Lead.DoesNotExist:
+        messages.error(request, 'Lead not found.', extra_tags='alert alert-warning')
+
+    return redirect('msp_specialist')
+
+def delete_lead(request, lead_id):
+    try:
+        lead = Lead.objects.get(id=lead_id)
+        lead.delete()
+        
+        messages.success(request, 'Lead deleted successfully.', extra_tags='alert alert-success')
     except Lead.DoesNotExist:
         messages.error(request, 'Lead not found.', extra_tags='alert alert-warning')
 
@@ -849,8 +867,8 @@ def get_mailbox_emails(request, EMAIL_HOST, EMAIL_USER, EMAIL_PASS):
                         # Avoid duplicates
                         exists = EmailMessage.objects.filter(
                             email=contact,
-                            content__startswith=body[:50],
-                            timestamp__date=parsed_date.date(),
+                            direction="incoming",
+                            timestamp__date=parsed_date,
                             created_by=User.objects.get(username=request.user)
                         ).exists()
 
